@@ -35,10 +35,6 @@ class IntegrationTestKernel extends BaseKernel
             'validation' => [
                 'email_validation_mode' => 'html5',
             ],
-            'uid' => [
-                'default_uuid_version' => 7,
-                'time_based_uuid_version' => 7,
-            ],
         ]);
 
         // Doctrine 配置 - 使用内存数据库
