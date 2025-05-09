@@ -31,10 +31,6 @@ class IntegrationTestKernel extends BaseKernel
             'php_errors' => [
                 'log' => true,
             ],
-            // 添加必要的配置以避免警告
-            'validation' => [
-                'email_validation_mode' => 'html5',
-            ],
         ]);
 
         // Doctrine 配置 - 使用内存数据库
