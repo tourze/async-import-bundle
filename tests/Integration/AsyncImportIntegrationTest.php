@@ -2,13 +2,18 @@
 
 namespace AsyncImportBundle\Tests\Integration;
 
+use AsyncImportBundle\AsyncImportBundle;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Tourze\IntegrationTestKernel\IntegrationTestKernel;
 
 class AsyncImportIntegrationTest extends KernelTestCase
 {
-    protected static function getKernelClass(): string
+    protected static function createKernel(array $options = []): KernelInterface
     {
-        return IntegrationTestKernel::class;
+        return new IntegrationTestKernel('test', true, [
+            AsyncImportBundle::class => ['all' => true],
+        ]);
     }
 
     protected function setUp(): void
