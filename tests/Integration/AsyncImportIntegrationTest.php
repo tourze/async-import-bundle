@@ -14,9 +14,16 @@ class AsyncImportIntegrationTest extends KernelTestCase
         $env = $options['environment'] ?? $_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? 'test';
         $debug = $options['debug'] ?? $_ENV['APP_DEBUG'] ?? $_SERVER['APP_DEBUG'] ?? true;
 
-        return new IntegrationTestKernel($env, $debug, [
-            AsyncImportBundle::class => ['all' => true],
-        ]);
+        return new IntegrationTestKernel(
+            $env, 
+            $debug, 
+            [
+                AsyncImportBundle::class => ['all' => true],
+            ],
+            [
+                'AsyncImportBundle\Tests' => __DIR__ . '/..',
+            ]
+        );
     }
 
     protected function setUp(): void
