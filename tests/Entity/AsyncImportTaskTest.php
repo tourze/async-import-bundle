@@ -25,14 +25,21 @@ class AsyncImportTaskTest extends TestCase
     {
         // 创建模拟用户对象
         $mockUser = $this->createMock(UserInterface::class);
+        $mockUser->expects($this->once())
+            ->method('getUserIdentifier')
+            ->willReturn('test-user-id');
         
-        // 测试设置值
+        // 测试通过 UserInterface 设置
         $this->assertSame($this->task, $this->task->setUser($mockUser));
-        $this->assertSame($mockUser, $this->task->getUser());
+        $this->assertSame('test-user-id', $this->task->getUserId());
+        
+        // 测试直接设置用户ID
+        $this->assertSame($this->task, $this->task->setUserId('another-user-id'));
+        $this->assertSame('another-user-id', $this->task->getUserId());
         
         // 测试设置null
         $this->assertSame($this->task, $this->task->setUser(null));
-        $this->assertNull($this->task->getUser());
+        $this->assertNull($this->task->getUserId());
     }
 
     public function testFile_setterAndGetter(): void

@@ -6,5 +6,23 @@ services:
 
   AsyncImportBundle\Repository\:
     resource: '../../Repository/'
+    
   AsyncImportBundle\Service\:
     resource: '../../Service/'
+    exclude:
+      - '../../Service/ImportHandlerInterface.php'
+      - '../../Service/FileParserInterface.php'
+      - '../../Service/ValidationResult.php'
+
+  # 配置主服务
+  AsyncImportBundle\Service\AsyncImportService:
+    arguments:
+      $uploadDirectory: '%kernel.project_dir%/var/import'
+
+  # 文件解析器自动标签
+  _instanceof:
+    AsyncImportBundle\Service\FileParserInterface:
+      tags: ['async_import.file_parser']
+      
+    AsyncImportBundle\Service\ImportHandlerInterface:
+      tags: ['async_import.handler']
