@@ -43,7 +43,10 @@ class AsyncImportService
         $task = new AsyncImportTask();
         $task->setFile($fileName);
         $task->setEntityClass($entityClass);
-        $task->setUser($this->security->getUser());
+        $user = $this->security->getUser();
+        if ($user) {
+            $task->setUserId($user->getUserIdentifier());
+        }
         $task->setStatus(ImportTaskStatus::PENDING);
         $task->setImportConfig($options);
         

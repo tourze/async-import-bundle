@@ -217,7 +217,7 @@ class ExcelParser implements FileParserInterface
             $reader->setReadEmptyCells(false);
             
             // 尝试加载第一个工作表
-            $reader->setLoadSheetsOnly(0);
+            $reader->setLoadSheetsOnly(['Sheet1']);
             $spreadsheet = $reader->load($filePath);
             
             // 检查是否有工作表

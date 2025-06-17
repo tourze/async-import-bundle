@@ -18,7 +18,7 @@ class AsyncImportErrorLog
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
-    private ?int $id = 0;
+    private int $id = 0;
 
     #[ORM\Column(type: Types::STRING, length: 1000, options: ['comment' => '实体类名'])]
     private ?string $entityClass = null;

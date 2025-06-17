@@ -64,6 +64,6 @@ class FileParserFactory
                 }
             }
         }
-        return array_unique($types);
+        return array_unique($types, SORT_REGULAR);
     }
 }

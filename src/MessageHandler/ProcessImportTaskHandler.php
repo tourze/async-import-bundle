@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 
 /**
  * 处理导入任务的消息处理器
@@ -175,7 +176,7 @@ class ProcessImportTaskHandler
             $delay = pow(2, $task->getRetryCount()) * 60 * 1000; // 毫秒
             
             $this->messageBus->dispatch($retryMessage, [
-                'delay' => $delay
+                new DelayStamp($delay)
             ]);
             
             $this->logger->info('Task scheduled for retry', [

@@ -4,7 +4,6 @@ namespace AsyncImportBundle\Tests\Entity;
 
 use AsyncImportBundle\Entity\AsyncImportTask;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 class AsyncImportTaskTest extends TestCase
 {
@@ -23,22 +22,16 @@ class AsyncImportTaskTest extends TestCase
 
     public function testUser_setterAndGetter(): void
     {
-        // 创建模拟用户对象
-        $mockUser = $this->createMock(UserInterface::class);
-        $mockUser->expects($this->once())
-            ->method('getUserIdentifier')
-            ->willReturn('test-user-id');
-        
-        // 测试通过 UserInterface 设置
-        $this->assertSame($this->task, $this->task->setUser($mockUser));
+        // 测试直接设置用户ID
+        $this->assertSame($this->task, $this->task->setUserId('test-user-id'));
         $this->assertSame('test-user-id', $this->task->getUserId());
         
-        // 测试直接设置用户ID
+        // 测试设置另一个用户ID
         $this->assertSame($this->task, $this->task->setUserId('another-user-id'));
         $this->assertSame('another-user-id', $this->task->getUserId());
         
         // 测试设置null
-        $this->assertSame($this->task, $this->task->setUser(null));
+        $this->assertSame($this->task, $this->task->setUserId(null));
         $this->assertNull($this->task->getUserId());
     }
 
@@ -160,7 +153,7 @@ class AsyncImportTaskTest extends TestCase
 
     public function testCreateTime_setterAndGetter(): void
     {
-        $now = new \DateTime();
+        $now = new \DateTimeImmutable();
         
         // 测试设置值
         $this->task->setCreateTime($now);
@@ -173,7 +166,7 @@ class AsyncImportTaskTest extends TestCase
 
     public function testUpdateTime_setterAndGetter(): void
     {
-        $now = new \DateTime();
+        $now = new \DateTimeImmutable();
         
         // 测试设置值
         $this->task->setUpdateTime($now);

@@ -64,7 +64,7 @@ class ImportProgressTracker
                 $success,
                 $failed,
                 $tracker['speed'],
-                $eta
+                $eta !== null ? (int) $eta : null
             );
 
             $this->eventDispatcher->dispatch($event);
