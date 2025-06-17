@@ -9,8 +9,8 @@ use AsyncImportBundle\Repository\AsyncImportErrorLogRepository;
 use AsyncImportBundle\Repository\AsyncImportTaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Security\Core\Security;
 
 /**
  * 异步导入主服务
