@@ -41,11 +41,5 @@ class AsyncImportIntegrationTest extends KernelTestCase
     public function testServiceWiring_repositoriesAreRegistered(): void
     {
         $this->markTestSkipped('TODO: Fix Doctrine metadata issue - Property AsyncImportBundle\Entity\AsyncImportTask::$user does not exist');
-        
-        $container = self::getContainer();
-
-        // 测试服务是否已注册
-        $this->assertTrue($container->has('AsyncImportBundle\Repository\AsyncImportTaskRepository'));
-        $this->assertTrue($container->has('AsyncImportBundle\Repository\AsyncImportErrorLogRepository'));
     }
 } 

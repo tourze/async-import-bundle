@@ -164,18 +164,16 @@ class ExcelParser implements FileParserInterface
         $headers = [];
         $firstRow = $worksheet->getRowIterator(1, 1)->current();
         
-        if ($firstRow) {
-            $cellIterator = $firstRow->getCellIterator();
-            $cellIterator->setIterateOnlyExistingCells(false);
-            
-            foreach ($cellIterator as $cell) {
-                $value = $cell->getCalculatedValue();
-                if ($value !== null && $value !== '') {
-                    $headers[] = trim((string) $value);
-                } else {
-                    // 如果遇到空列，停止读取
-                    break;
-                }
+        $cellIterator = $firstRow->getCellIterator();
+        $cellIterator->setIterateOnlyExistingCells(false);
+        
+        foreach ($cellIterator as $cell) {
+            $value = $cell->getCalculatedValue();
+            if ($value !== null && $value !== '') {
+                $headers[] = trim((string) $value);
+            } else {
+                // 如果遇到空列，停止读取
+                break;
             }
         }
         
