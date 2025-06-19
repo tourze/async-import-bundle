@@ -2,12 +2,14 @@
 
 namespace AsyncImportBundle\Enum;
 
-use Tourze\EnumExtra\ItemTrait;
+use Tourze\EnumExtra\Itemable;
 use Tourze\EnumExtra\Labelable;
+use Tourze\EnumExtra\Selectable;
+use Tourze\EnumExtra\SelectTrait;
 
-enum ImportFileType: string implements Labelable
+enum ImportFileType: string implements Labelable, Itemable, Selectable
 {
-    use ItemTrait;
+    use SelectTrait;
 
     case CSV = 'csv';
     case EXCEL = 'excel';

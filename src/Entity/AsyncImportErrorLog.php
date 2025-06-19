@@ -13,7 +13,7 @@ use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
  */
 #[ORM\Entity(repositoryClass: AsyncImportErrorLogRepository::class, readOnly: true)]
 #[ORM\Table(name: 'async_import_error_log', options: ['comment' => '异步导入错误日志'])]
-class AsyncImportErrorLog
+class AsyncImportErrorLog implements \Stringable
 {
     use CreateTimeAware;
 
@@ -109,5 +109,10 @@ class AsyncImportErrorLog
         $this->newRow = $newRow;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return sprintf('AsyncImportErrorLog #%d', $this->getId() ?? 0);
     }
 }

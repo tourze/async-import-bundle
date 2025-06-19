@@ -64,17 +64,17 @@ class AsyncImportTask implements \Stringable
     #[ORM\Column(type: Types::INTEGER, options: ['default' => 0, 'comment' => '优先级'])]
     private int $priority = 0;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '开始时间'])]
-    private ?\DateTimeInterface $startTime = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '开始时间'])]
+    private ?\DateTimeImmutable $startTime = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '结束时间'])]
-    private ?\DateTimeInterface $endTime = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '结束时间'])]
+    private ?\DateTimeImmutable $endTime = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '最后错误信息'])]
     private ?string $lastErrorMessage = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $lastErrorTime = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '最后错误时间'])]
+    private ?\DateTimeImmutable $lastErrorTime = null;
 
     #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['default' => 0, 'comment' => '总行数'])]
     private ?int $totalCount = 0;
@@ -152,12 +152,12 @@ class AsyncImportTask implements \Stringable
         return $this;
     }
 
-    public function getLastErrorTime(): ?\DateTimeInterface
+    public function getLastErrorTime(): ?\DateTimeImmutable
     {
         return $this->lastErrorTime;
     }
 
-    public function setLastErrorTime(?\DateTimeInterface $lastErrorTime): static
+    public function setLastErrorTime(?\DateTimeImmutable $lastErrorTime): static
     {
         $this->lastErrorTime = $lastErrorTime;
 
@@ -297,24 +297,24 @@ class AsyncImportTask implements \Stringable
         return $this;
     }
 
-    public function getStartTime(): ?\DateTimeInterface
+    public function getStartTime(): ?\DateTimeImmutable
     {
         return $this->startTime;
     }
 
-    public function setStartTime(?\DateTimeInterface $startTime): self
+    public function setStartTime(?\DateTimeImmutable $startTime): self
     {
         $this->startTime = $startTime;
 
         return $this;
     }
 
-    public function getEndTime(): ?\DateTimeInterface
+    public function getEndTime(): ?\DateTimeImmutable
     {
         return $this->endTime;
     }
 
-    public function setEndTime(?\DateTimeInterface $endTime): self
+    public function setEndTime(?\DateTimeImmutable $endTime): self
     {
         $this->endTime = $endTime;
 
