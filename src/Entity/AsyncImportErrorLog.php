@@ -6,7 +6,7 @@ use AsyncImportBundle\Repository\AsyncImportErrorLogRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
-use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
+use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 
 /**
  * 这里记录的是第几行的错误
@@ -15,6 +15,8 @@ use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
 #[ORM\Table(name: 'async_import_error_log', options: ['comment' => '异步导入错误日志'])]
 class AsyncImportErrorLog
 {
+    use CreateTimeAware;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
@@ -39,11 +41,6 @@ class AsyncImportErrorLog
 
     #[ORM\Column(nullable: true, options: ['comment' => '格式化数据'])]
     private ?array $newRow = null;
-
-    #[IndexColumn]
-    #[CreateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
-    private ?\DateTimeInterface $createTime = null;
 
     public function getId(): ?int
     {
@@ -112,17 +109,5 @@ class AsyncImportErrorLog
         $this->newRow = $newRow;
 
         return $this;
-    }
-
-    public function setCreateTime(?\DateTimeInterface $createdAt): self
-    {
-        $this->createTime = $createdAt;
-
-        return $this;
-    }
-
-    public function getCreateTime(): ?\DateTimeInterface
-    {
-        return $this->createTime;
     }
 }
