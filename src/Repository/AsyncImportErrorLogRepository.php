@@ -22,7 +22,7 @@ class AsyncImportErrorLogRepository extends ServiceEntityRepository
 
     /**
      * 按任务ID查找错误日志
-     * 
+     *
      * @return AsyncImportErrorLog[]
      */
     public function findByTaskId(string $taskId, ?int $limit = null, ?int $offset = null): array
@@ -97,7 +97,7 @@ class AsyncImportErrorLogRepository extends ServiceEntityRepository
 
     /**
      * 获取最近的错误日志
-     * 
+     *
      * @return AsyncImportErrorLog[]
      */
     public function findRecent(int $limit = 100): array

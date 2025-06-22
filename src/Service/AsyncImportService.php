@@ -44,7 +44,7 @@ class AsyncImportService
         $task->setFile($fileName);
         $task->setEntityClass($entityClass);
         $user = $this->security->getUser();
-        if ($user) {
+        if ($user !== null) {
             $task->setUserId($user->getUserIdentifier());
         }
         $task->setStatus(ImportTaskStatus::PENDING);
@@ -137,7 +137,7 @@ class AsyncImportService
 
         // 更新任务的错误信息
         $task->setLastErrorMessage($error);
-        $task->setLastErrorTime(new \DateTime());
+        $task->setLastErrorTime(new \DateTimeImmutable());
         $task->setFailCount($task->getFailCount() + 1);
 
         $this->entityManager->flush();
@@ -176,7 +176,7 @@ class AsyncImportService
             'totalCount' => $task->getTotalCount(),
             'successCount' => $task->getSuccessCount(),
             'failCount' => $task->getFailCount(),
-            'duration' => $task->getStartTime() && $task->getEndTime()
+            'duration' => $task->getStartTime() !== null && $task->getEndTime() !== null
                 ? $task->getEndTime()->getTimestamp() - $task->getStartTime()->getTimestamp()
                 : 0
         ]);
@@ -189,12 +189,12 @@ class AsyncImportService
     {
         $task->setStatus($status);
 
-        if ($status === ImportTaskStatus::PROCESSING && !$task->getStartTime()) {
-            $task->setStartTime(new \DateTime());
+        if ($status === ImportTaskStatus::PROCESSING && $task->getStartTime() === null) {
+            $task->setStartTime(new \DateTimeImmutable());
         }
 
         if (in_array($status, [ImportTaskStatus::COMPLETED, ImportTaskStatus::FAILED, ImportTaskStatus::CANCELLED])) {
-            $task->setEndTime(new \DateTime());
+            $task->setEndTime(new \DateTimeImmutable());
         }
 
         $this->entityManager->flush();
@@ -206,7 +206,7 @@ class AsyncImportService
     public function failTask(AsyncImportTask $task, string $error): void
     {
         $task->setLastErrorMessage($error);
-        $task->setLastErrorTime(new \DateTime());
+        $task->setLastErrorTime(new \DateTimeImmutable());
         $this->updateTaskStatus($task, ImportTaskStatus::FAILED);
 
         $this->logger->error('Import task failed', [

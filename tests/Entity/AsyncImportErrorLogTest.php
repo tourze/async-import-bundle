@@ -118,7 +118,7 @@ class AsyncImportErrorLogTest extends TestCase
 
     public function testCreateTime_setterAndGetter(): void
     {
-        $now = new \DateTime();
+        $now = new \DateTimeImmutable();
         
         // 测试设置值
         $result = $this->errorLog->setCreateTime($now);

@@ -33,7 +33,7 @@ class ProcessImportBatchHandler
     {
         $task = $this->taskRepository->find($message->getTaskId());
         
-        if (!$task) {
+        if ($task === null) {
             $this->logger->error('Import task not found', ['taskId' => $message->getTaskId()]);
             return;
         }

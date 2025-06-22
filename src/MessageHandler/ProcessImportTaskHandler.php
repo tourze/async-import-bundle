@@ -39,7 +39,7 @@ class ProcessImportTaskHandler
     {
         $task = $this->taskRepository->find($message->getTaskId());
         
-        if (!$task) {
+        if ($task === null) {
             $this->logger->error('Import task not found', ['taskId' => $message->getTaskId()]);
             return;
         }
@@ -55,7 +55,7 @@ class ProcessImportTaskHandler
             
             // 获取文件解析器
             $fileType = $task->getFileType();
-            if (!$fileType) {
+            if ($fileType === null) {
                 $fileType = $this->parserFactory->guessFileType($task->getFile());
                 $task->setFileType($fileType);
             }

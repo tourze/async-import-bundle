@@ -17,7 +17,7 @@ interface ImportHandlerInterface
 
     /**
      * 验证单行数据
-     * 
+     *
      * @param array $row 原始数据行
      * @param int $lineNumber 行号
      * @return ValidationResult 验证结果
@@ -26,7 +26,7 @@ interface ImportHandlerInterface
 
     /**
      * 导入单行数据
-     * 
+     *
      * @param array $row 已验证的数据行
      * @param AsyncImportTask $task 导入任务
      * @throws \Exception 导入失败时抛出异常

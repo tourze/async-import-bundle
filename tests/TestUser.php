@@ -2,22 +2,23 @@
 
 namespace AsyncImportBundle\Tests;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'test_user')]
-class TestUser implements UserInterface
+#[ORM\Table(name: 'test_user', options: ['comment' => '测试用户表'])]
+class TestUser implements UserInterface, \Stringable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: Types::INTEGER, options: ['comment' => '主键ID'])]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[ORM\Column(type: Types::STRING, length: 180, unique: true, options: ['comment' => '用户名'])]
     private string $username = '';
 
-    #[ORM\Column(type: 'json')]
+    #[ORM\Column(type: Types::JSON, options: ['comment' => '用户角色'])]
     private array $roles = [];
 
     public function getId(): ?int
@@ -54,6 +55,11 @@ class TestUser implements UserInterface
     }
 
     public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
+
+    public function __toString(): string
     {
         return $this->username;
     }

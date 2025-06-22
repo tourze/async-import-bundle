@@ -26,7 +26,7 @@ class AsyncImportTaskRepository extends ServiceEntityRepository
 
     /**
      * 查找待处理的任务
-     * 
+     *
      * @return AsyncImportTask[]
      */
     public function findPendingTasks(?int $limit = null): array
@@ -46,7 +46,7 @@ class AsyncImportTaskRepository extends ServiceEntityRepository
 
     /**
      * 查找可重试的失败任务
-     * 
+     *
      * @return AsyncImportTask[]
      */
     public function findRetryableTasks(): array
@@ -63,7 +63,7 @@ class AsyncImportTaskRepository extends ServiceEntityRepository
 
     /**
      * 查找过期的任务
-     * 
+     *
      * @return AsyncImportTask[]
      */
     public function findOldTasks(\DateTimeInterface $beforeDate): array
@@ -77,7 +77,7 @@ class AsyncImportTaskRepository extends ServiceEntityRepository
 
     /**
      * 按用户查找任务
-     * 
+     *
      * @param string|UserInterface $user 用户ID或用户对象
      * @return AsyncImportTask[]
      */

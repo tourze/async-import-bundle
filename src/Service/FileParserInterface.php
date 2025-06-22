@@ -16,7 +16,7 @@ interface FileParserInterface
 
     /**
      * 解析文件并返回数据行迭代器
-     * 
+     *
      * @param string $filePath 文件路径
      * @param array $options 解析选项
      * @return \Iterator 数据行迭代器

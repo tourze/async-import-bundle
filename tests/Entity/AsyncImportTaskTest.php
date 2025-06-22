@@ -81,7 +81,7 @@ class AsyncImportTaskTest extends TestCase
 
     public function testLastErrorTime_setterAndGetter(): void
     {
-        $now = new \DateTime();
+        $now = new \DateTimeImmutable();
         
         // 测试设置值
         $this->assertSame($this->task, $this->task->setLastErrorTime($now));
