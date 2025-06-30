@@ -4,6 +4,7 @@ namespace AsyncImportBundle\MessageHandler;
 
 use AsyncImportBundle\Entity\AsyncImportTask;
 use AsyncImportBundle\Enum\ImportTaskStatus;
+use AsyncImportBundle\Exception\ImportTaskException;
 use AsyncImportBundle\Message\ProcessImportBatchMessage;
 use AsyncImportBundle\Message\ProcessImportTaskMessage;
 use AsyncImportBundle\Repository\AsyncImportTaskRepository;
@@ -66,7 +67,7 @@ class ProcessImportTaskHandler
             // 验证文件格式
             $validationResult = $parser->validateFormat($filePath);
             if (!$validationResult->isValid()) {
-                throw new \RuntimeException('文件格式验证失败: ' . $validationResult->getErrorMessage());
+                throw new ImportTaskException('文件格式验证失败: ' . $validationResult->getErrorMessage());
             }
             
             // 获取导入处理器

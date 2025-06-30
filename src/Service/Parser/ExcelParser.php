@@ -3,6 +3,7 @@
 namespace AsyncImportBundle\Service\Parser;
 
 use AsyncImportBundle\Enum\ImportFileType;
+use AsyncImportBundle\Exception\FileParseException;
 use AsyncImportBundle\Service\FileParserInterface;
 use AsyncImportBundle\Service\ValidationResult;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -34,7 +35,7 @@ class ExcelParser implements FileParserInterface
         $maxRows = $options['maxRows'] ?? null;
         
         if (!file_exists($filePath)) {
-            throw new \RuntimeException(sprintf('File not found: %s', $filePath));
+            throw new FileParseException(sprintf('File not found: %s', $filePath));
         }
         
         // 使用 IOFactory 自动检测文件类型
@@ -118,7 +119,7 @@ class ExcelParser implements FileParserInterface
         $skipHeader = $options['skipHeader'] ?? true;
         
         if (!file_exists($filePath)) {
-            throw new \RuntimeException(sprintf('File not found: %s', $filePath));
+            throw new FileParseException(sprintf('File not found: %s', $filePath));
         }
         
         $reader = IOFactory::createReaderForFile($filePath);
@@ -151,7 +152,7 @@ class ExcelParser implements FileParserInterface
         $sheetIndex = $options['sheetIndex'] ?? 0;
         
         if (!file_exists($filePath)) {
-            throw new \RuntimeException(sprintf('File not found: %s', $filePath));
+            throw new FileParseException(sprintf('File not found: %s', $filePath));
         }
         
         $reader = IOFactory::createReaderForFile($filePath);
@@ -240,7 +241,7 @@ class ExcelParser implements FileParserInterface
     public function getSheetNames(string $filePath): array
     {
         if (!file_exists($filePath)) {
-            throw new \RuntimeException(sprintf('File not found: %s', $filePath));
+            throw new FileParseException(sprintf('File not found: %s', $filePath));
         }
         
         $reader = IOFactory::createReaderForFile($filePath);

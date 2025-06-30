@@ -1,6 +1,6 @@
 <?php
 
-namespace AsyncImportBundle\Tests;
+namespace AsyncImportBundle\Tests\Fixtures\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;

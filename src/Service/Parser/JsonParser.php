@@ -3,6 +3,7 @@
 namespace AsyncImportBundle\Service\Parser;
 
 use AsyncImportBundle\Enum\ImportFileType;
+use AsyncImportBundle\Exception\FileParseException;
 use AsyncImportBundle\Service\FileParserInterface;
 use AsyncImportBundle\Service\ValidationResult;
 
@@ -28,18 +29,18 @@ class JsonParser implements FileParserInterface
         $skipHeader = $options['skipHeader'] ?? false; // JSON 通常不需要跳过表头
         
         if (!file_exists($filePath)) {
-            throw new \RuntimeException(sprintf('File not found: %s', $filePath));
+            throw new FileParseException(sprintf('File not found: %s', $filePath));
         }
         
         $content = file_get_contents($filePath);
         if ($content === false) {
-            throw new \RuntimeException(sprintf('Failed to read file: %s', $filePath));
+            throw new FileParseException(sprintf('Failed to read file: %s', $filePath));
         }
         
         $data = json_decode($content, true);
         
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException(sprintf('Invalid JSON: %s', json_last_error_msg()));
+            throw new FileParseException(sprintf('Invalid JSON: %s', json_last_error_msg()));
         }
         
         // 如果指定了根键，获取该键的数据
@@ -49,7 +50,7 @@ class JsonParser implements FileParserInterface
         
         // 确保数据是数组
         if (!is_array($data)) {
-            throw new \RuntimeException('JSON data must be an array');
+            throw new FileParseException('JSON data must be an array');
         }
         
         // 如果不是索引数组，转换为索引数组
@@ -59,7 +60,7 @@ class JsonParser implements FileParserInterface
         
         foreach ($data as $index => $row) {
             if (!is_array($row)) {
-                throw new \RuntimeException(sprintf('Row %d is not an array', $index));
+                throw new FileParseException(sprintf('Row %d is not an array', $index));
             }
             
             yield $row;
@@ -74,18 +75,18 @@ class JsonParser implements FileParserInterface
         $rootKey = $options['rootKey'] ?? null;
         
         if (!file_exists($filePath)) {
-            throw new \RuntimeException(sprintf('File not found: %s', $filePath));
+            throw new FileParseException(sprintf('File not found: %s', $filePath));
         }
         
         $content = file_get_contents($filePath);
         if ($content === false) {
-            throw new \RuntimeException(sprintf('Failed to read file: %s', $filePath));
+            throw new FileParseException(sprintf('Failed to read file: %s', $filePath));
         }
         
         $data = json_decode($content, true);
         
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException(sprintf('Invalid JSON: %s', json_last_error_msg()));
+            throw new FileParseException(sprintf('Invalid JSON: %s', json_last_error_msg()));
         }
         
         // 如果指定了根键，获取该键的数据
@@ -113,18 +114,18 @@ class JsonParser implements FileParserInterface
         $rootKey = $options['rootKey'] ?? null;
         
         if (!file_exists($filePath)) {
-            throw new \RuntimeException(sprintf('File not found: %s', $filePath));
+            throw new FileParseException(sprintf('File not found: %s', $filePath));
         }
         
         $content = file_get_contents($filePath);
         if ($content === false) {
-            throw new \RuntimeException(sprintf('Failed to read file: %s', $filePath));
+            throw new FileParseException(sprintf('Failed to read file: %s', $filePath));
         }
         
         $data = json_decode($content, true);
         
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException(sprintf('Invalid JSON: %s', json_last_error_msg()));
+            throw new FileParseException(sprintf('Invalid JSON: %s', json_last_error_msg()));
         }
         
         // 如果指定了根键，获取该键的数据

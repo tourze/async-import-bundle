@@ -4,6 +4,7 @@ namespace AsyncImportBundle\MessageHandler;
 
 use AsyncImportBundle\Entity\AsyncImportTask;
 use AsyncImportBundle\Enum\ImportTaskStatus;
+use AsyncImportBundle\Exception\ImportTaskException;
 use AsyncImportBundle\Message\ProcessImportBatchMessage;
 use AsyncImportBundle\Repository\AsyncImportTaskRepository;
 use AsyncImportBundle\Service\AsyncImportService;
@@ -68,7 +69,7 @@ class ProcessImportBatchHandler
                     $validationResult = $handler->validate($processedRow, $lineNumber);
                     
                     if (!$validationResult->isValid()) {
-                        throw new \RuntimeException($validationResult->getErrorMessage());
+                        throw new ImportTaskException($validationResult->getErrorMessage());
                     }
                     
                     // 导入数据

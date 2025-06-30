@@ -2,6 +2,7 @@
 
 namespace AsyncImportBundle\Service;
 
+use AsyncImportBundle\Exception\ImportHandlerNotFoundException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
@@ -15,7 +16,7 @@ class ImportHandlerRegistry
     private iterable $handlers;
 
     public function __construct(
-        #[AutowireIterator('async_import.handler')] iterable $handlers
+        #[AutowireIterator(tag: 'async_import.handler')] iterable $handlers
     ) {
         $this->handlers = $handlers;
     }
@@ -31,7 +32,7 @@ class ImportHandlerRegistry
             }
         }
 
-        throw new \RuntimeException(sprintf('No import handler found for entity class: %s', $entityClass));
+        throw new ImportHandlerNotFoundException(sprintf('No import handler found for entity class: %s', $entityClass));
     }
 
     /**

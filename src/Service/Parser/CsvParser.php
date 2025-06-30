@@ -3,6 +3,7 @@
 namespace AsyncImportBundle\Service\Parser;
 
 use AsyncImportBundle\Enum\ImportFileType;
+use AsyncImportBundle\Exception\FileParseException;
 use AsyncImportBundle\Service\FileParserInterface;
 use AsyncImportBundle\Service\ValidationResult;
 
@@ -31,12 +32,12 @@ class CsvParser implements FileParserInterface
         $encoding = $options['encoding'] ?? 'UTF-8';
         
         if (!file_exists($filePath)) {
-            throw new \RuntimeException(sprintf('File not found: %s', $filePath));
+            throw new FileParseException(sprintf('File not found: %s', $filePath));
         }
         
         $handle = fopen($filePath, 'r');
         if (!$handle) {
-            throw new \RuntimeException(sprintf('Failed to open file: %s', $filePath));
+            throw new FileParseException(sprintf('Failed to open file: %s', $filePath));
         }
         
         // 检测并转换编码
@@ -94,14 +95,14 @@ class CsvParser implements FileParserInterface
         $skipHeader = $options['skipHeader'] ?? true;
         
         if (!file_exists($filePath)) {
-            throw new \RuntimeException(sprintf('File not found: %s', $filePath));
+            throw new FileParseException(sprintf('File not found: %s', $filePath));
         }
         
         $lineCount = 0;
         $handle = fopen($filePath, 'r');
         
         if (!$handle) {
-            throw new \RuntimeException(sprintf('Failed to open file: %s', $filePath));
+            throw new FileParseException(sprintf('Failed to open file: %s', $filePath));
         }
         
         try {
@@ -131,12 +132,12 @@ class CsvParser implements FileParserInterface
         $encoding = $options['encoding'] ?? 'UTF-8';
         
         if (!file_exists($filePath)) {
-            throw new \RuntimeException(sprintf('File not found: %s', $filePath));
+            throw new FileParseException(sprintf('File not found: %s', $filePath));
         }
         
         $handle = fopen($filePath, 'r');
         if (!$handle) {
-            throw new \RuntimeException(sprintf('Failed to open file: %s', $filePath));
+            throw new FileParseException(sprintf('Failed to open file: %s', $filePath));
         }
         
         // 检测并转换编码

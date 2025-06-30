@@ -99,7 +99,7 @@ class AsyncImportService
             '%s_%s.%s',
             date('YmdHis'),
             uniqid(),
-            $file->guessExtension() ?: $file->getClientOriginalExtension()
+            $file->guessExtension() ?? $file->getClientOriginalExtension()
         );
 
         $file->move($this->uploadDirectory, $fileName);

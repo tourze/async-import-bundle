@@ -3,6 +3,8 @@
 namespace AsyncImportBundle\Service;
 
 use AsyncImportBundle\Enum\ImportFileType;
+use AsyncImportBundle\Exception\FileParserNotFoundException;
+use AsyncImportBundle\Exception\UnsupportedFileTypeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
@@ -16,7 +18,7 @@ class FileParserFactory
     private iterable $parsers;
 
     public function __construct(
-        #[AutowireIterator('async_import.file_parser')] iterable $parsers
+        #[AutowireIterator(tag: 'async_import.file_parser')] iterable $parsers
     ) {
         $this->parsers = $parsers;
     }
@@ -32,7 +34,7 @@ class FileParserFactory
             }
         }
 
-        throw new \RuntimeException(sprintf('No parser found for file type: %s', $fileType->value));
+        throw new FileParserNotFoundException(sprintf('No parser found for file type: %s', $fileType->value));
     }
 
     /**
@@ -47,7 +49,7 @@ class FileParserFactory
             'xls' => ImportFileType::XLS,
             'xlsx' => ImportFileType::XLSX,
             'json' => ImportFileType::JSON,
-            default => throw new \RuntimeException(sprintf('Unknown file extension: %s', $extension))
+            default => throw new UnsupportedFileTypeException(sprintf('Unknown file extension: %s', $extension))
         };
     }
 
