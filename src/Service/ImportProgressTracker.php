@@ -11,10 +11,14 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class ImportProgressTracker
 {
+    /**
+     * @var array<string, array{startTime: float, lastUpdate: float, processed: int, success: int, failed: int, lastBatch: int, speed: float}>
+     */
     private array $progress = [];
-    
+
     public function __construct(
-        private readonly EventDispatcherInterface $eventDispatcher
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly AsyncImportService $asyncImportService,
     ) {
     }
 
@@ -26,7 +30,7 @@ class ImportProgressTracker
         int $processed,
         int $success,
         int $failed,
-        bool $dispatchEvent = true
+        bool $dispatchEvent = true,
     ): void {
         $taskId = $task->getId();
 
@@ -35,7 +39,7 @@ class ImportProgressTracker
         }
 
         $now = microtime(true);
-        $tracker = &$this->progress[$taskId];
+        $tracker = $this->progress[$taskId];
 
         // 计算处理速度
         $timeDiff = $now - $tracker['lastUpdate'];
@@ -52,8 +56,12 @@ class ImportProgressTracker
         $tracker['lastUpdate'] = $now;
         $tracker['lastBatch'] = $rowsDiff;
 
+        // 重新赋值到进度数组
+        $this->progress[$taskId] = $tracker;
+
         // 计算预计剩余时间
-        $remaining = $task->getTotalCount() - $processed;
+        $totalCount = $task->getTotalCount();
+        $remaining = null !== $totalCount ? $totalCount - $processed : 0;
         $eta = $tracker['speed'] > 0 ? round($remaining / $tracker['speed']) : null;
 
         // 发送进度事件
@@ -64,7 +72,8 @@ class ImportProgressTracker
                 $success,
                 $failed,
                 $tracker['speed'],
-                $eta !== null ? (int) $eta : null
+                null !== $eta ? (int) $eta : null,
+                $this->asyncImportService->getTaskProgressPercentage($task)
             );
 
             $this->eventDispatcher->dispatch($event);
@@ -83,68 +92,75 @@ class ImportProgressTracker
             'success' => 0,
             'failed' => 0,
             'lastBatch' => 0,
-            'speed' => 0
+            'speed' => 0,
         ];
     }
 
     /**
      * 停止追踪
+     *
+     * @return array<string, mixed>
      */
     public function stopTracking(AsyncImportTask $task): array
     {
         $taskId = $task->getId();
-        
+
         if (!isset($this->progress[$taskId])) {
             return [];
         }
-        
+
         $tracker = $this->progress[$taskId];
         $tracker['endTime'] = microtime(true);
         $tracker['duration'] = $tracker['endTime'] - $tracker['startTime'];
         $tracker['averageSpeed'] = $tracker['processed'] / $tracker['duration'];
-        
+
         unset($this->progress[$taskId]);
-        
+
         return $tracker;
     }
 
     /**
      * 获取任务进度信息
+     *
+     * @return array<string, mixed>
      */
     public function getProgress(AsyncImportTask $task): array
     {
         $taskId = $task->getId();
-        
+
         if (!isset($this->progress[$taskId])) {
             return [
                 'processed' => $task->getProcessCount(),
                 'success' => $task->getSuccessCount(),
                 'failed' => $task->getFailCount(),
                 'total' => $task->getTotalCount(),
-                'percentage' => $task->getProgressPercentage(),
+                'percentage' => $this->asyncImportService->getTaskProgressPercentage($task),
                 'speed' => 0,
-                'eta' => null
+                'eta' => null,
             ];
         }
-        
+
         $tracker = $this->progress[$taskId];
-        $remaining = $task->getTotalCount() - $tracker['processed'];
+        $totalCount = $task->getTotalCount();
+        $remaining = null !== $totalCount ? $totalCount - $tracker['processed'] : 0;
         $eta = $tracker['speed'] > 0 ? round($remaining / $tracker['speed']) : null;
-        
+
         return [
             'processed' => $tracker['processed'],
             'success' => $tracker['success'],
             'failed' => $tracker['failed'],
             'total' => $task->getTotalCount(),
-            'percentage' => $task->getProgressPercentage(),
+            'percentage' => $this->asyncImportService->getTaskProgressPercentage($task),
             'speed' => $tracker['speed'],
             'eta' => $eta,
-            'duration' => microtime(true) - $tracker['startTime']
+            'duration' => microtime(true) - $tracker['startTime'],
         ];
     }
 
     /**
      * 获取所有正在追踪的任务ID
+     *
+     * @return array<string>
      */
     public function getTrackingTaskIds(): array
     {

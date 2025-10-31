@@ -8,17 +8,14 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 /**
  * 导入处理器注册表
  */
-class ImportHandlerRegistry
+readonly class ImportHandlerRegistry
 {
     /**
-     * @var ImportHandlerInterface[]
+     * @param ImportHandlerInterface[] $handlers
      */
-    private iterable $handlers;
-
     public function __construct(
-        #[AutowireIterator(tag: 'async_import.handler')] iterable $handlers
+        #[AutowireIterator(tag: 'async_import.handler')] private iterable $handlers,
     ) {
-        $this->handlers = $handlers;
     }
 
     /**
@@ -51,6 +48,8 @@ class ImportHandlerRegistry
 
     /**
      * 获取所有支持的实体类
+     *
+     * @return array<string>
      */
     public function getSupportedEntityClasses(): array
     {
@@ -58,11 +57,14 @@ class ImportHandlerRegistry
         foreach ($this->handlers as $handler) {
             $classes[] = $handler->getEntityClass();
         }
+
         return array_unique($classes);
     }
 
     /**
      * 获取所有处理器
+     *
+     * @return array<ImportHandlerInterface>
      */
     public function getAllHandlers(): array
     {

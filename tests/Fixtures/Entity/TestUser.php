@@ -34,6 +34,7 @@ class TestUser implements UserInterface, \Stringable
     public function setUsername(string $username): self
     {
         $this->username = $username;
+
         return $this;
     }
 
@@ -41,12 +42,14 @@ class TestUser implements UserInterface, \Stringable
     {
         $roles = $this->roles;
         $roles[] = 'ROLE_USER';
+
         return array_unique($roles);
     }
 
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
+
         return $this;
     }
 

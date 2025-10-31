@@ -1,6 +1,26 @@
 # AsyncImportBundle
 
-A powerful Symfony bundle for handling asynchronous file imports with support for CSV, Excel, and JSON formats. Features include progress tracking, error logging, retry mechanisms, and batch processing.
+[English](README.md) | [中文](README.zh-CN.md)
+
+[![Latest Version](https://img.shields.io/packagist/v/tourze/async-import-bundle.svg?style=flat-square)](https://packagist.org/packages/tourze/async-import-bundle)
+[![PHP Version](https://img.shields.io/packagist/php-v/tourze/async-import-bundle.svg?style=flat-square)](https://packagist.org/packages/tourze/async-import-bundle)
+[![License](https://img.shields.io/packagist/l/tourze/async-import-bundle.svg?style=flat-square)](https://packagist.org/packages/tourze/async-import-bundle)
+[![Code Coverage](https://img.shields.io/codecov/c/github/tourze/async-import-bundle?style=flat-square)](https://codecov.io/gh/tourze/async-import-bundle)
+
+A powerful Symfony bundle for handling asynchronous file imports with support for CSV, Excel, 
+and JSON formats. Features include progress tracking, error logging, retry mechanisms, and batch processing.
+
+## Table of Contents
+
+- [Features](#features)
+- [Dependencies](#dependencies)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [Advanced Usage](#advanced-usage)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
@@ -12,6 +32,28 @@ A powerful Symfony bundle for handling asynchronous file imports with support fo
 - **Batch Processing**: Configurable batch sizes for memory efficiency
 - **Extensible Architecture**: Easy to add custom import handlers
 - **EasyAdmin Integration**: Ready for admin panel integration
+
+## Dependencies
+
+### System Requirements
+
+- PHP 8.1 or higher
+- Symfony 6.4 or higher
+- Doctrine ORM 3.0 or higher
+
+### Required Extensions
+
+- ext-SPL
+- ext-date  
+- ext-json
+
+### Required Packages
+
+- doctrine/dbal ^4.0
+- doctrine/orm ^3.0
+- phpoffice/phpspreadsheet ^3.9
+- symfony/messenger ^6.4
+- And other Symfony components (see composer.json for complete list)
 
 ## Installation
 
@@ -72,9 +114,7 @@ chmod 755 var/import
 
 namespace App\Import;
 
-use AsyncImportBundle\Service\ImportHandlerInterface;
-use AsyncImportBundle\Service\ValidationResult;
-use AsyncImportBundle\Entity\AsyncImportTask;
+use AsyncImportBundle\DTO\ValidationResult;use AsyncImportBundle\Entity\AsyncImportTask;use AsyncImportBundle\Service\ImportHandlerInterface;
 
 class UserImportHandler implements ImportHandlerInterface
 {
@@ -188,7 +228,7 @@ public function progress(
 ## File Format Examples
 
 ### CSV
-```csv
+```text
 Email,Name
 john@example.com,John Doe
 jane@example.com,Jane Smith
@@ -257,7 +297,7 @@ The bundle dispatches several events:
 ./vendor/bin/phpunit packages/async-import-bundle/tests/Entity/AsyncImportTaskTest.php
 ```
 
-## Advanced Features
+## Advanced Usage
 
 ### Custom File Parsers
 

@@ -2,17 +2,17 @@
 
 namespace AsyncImportBundle\Enum;
 
+use Tourze\EnumExtra\BadgeInterface;
 use Tourze\EnumExtra\Itemable;
 use Tourze\EnumExtra\ItemTrait;
 use Tourze\EnumExtra\Labelable;
 use Tourze\EnumExtra\Selectable;
 use Tourze\EnumExtra\SelectTrait;
 
-enum ImportTaskStatus: string implements Labelable, Itemable, Selectable
+enum ImportTaskStatus: string implements Labelable, Itemable, Selectable, BadgeInterface
 {
     use ItemTrait;
     use SelectTrait;
-
     case PENDING = 'pending';
     case PROCESSING = 'processing';
     case COMPLETED = 'completed';
@@ -39,5 +39,10 @@ enum ImportTaskStatus: string implements Labelable, Itemable, Selectable
             self::FAILED => 'danger',
             self::CANCELLED => 'warning',
         };
+    }
+
+    public function getBadge(): string
+    {
+        return $this->color();
     }
 }

@@ -5,11 +5,11 @@ namespace AsyncImportBundle\Message;
 /**
  * 处理导入任务消息
  */
-class ProcessImportTaskMessage
+readonly class ProcessImportTaskMessage
 {
     public function __construct(
-        private readonly string $taskId,
-        private readonly bool $isRetry = false
+        private string $taskId,
+        private bool $isRetry = false,
     ) {
     }
 

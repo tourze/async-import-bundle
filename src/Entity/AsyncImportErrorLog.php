@@ -5,6 +5,7 @@ namespace AsyncImportBundle\Entity;
 use AsyncImportBundle\Repository\AsyncImportErrorLogRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 
@@ -22,23 +23,32 @@ class AsyncImportErrorLog implements \Stringable
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
     private int $id = 0;
 
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 1000)]
     #[ORM\Column(type: Types::STRING, length: 1000, options: ['comment' => '实体类名'])]
     private ?string $entityClass = null;
 
+    #[Assert\Length(max: 40)]
     #[IndexColumn]
     #[ORM\Column(length: 40, options: ['comment' => '任务ID'])]
     private ?string $taskId = null;
 
+    #[Assert\PositiveOrZero]
     #[IndexColumn]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => '第几行'])]
     private int $line = 0;
 
+    #[Assert\Length(max: 65535)]
     #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '异常信息'])]
     private ?string $error = null;
 
+    /** @var array<string, mixed>|null */
+    #[Assert\Type(type: 'array')]
     #[ORM\Column(nullable: true, options: ['comment' => '队列原始数据'])]
     private ?array $rawRow = null;
 
+    /** @var array<string, mixed>|null */
+    #[Assert\Type(type: 'array')]
     #[ORM\Column(nullable: true, options: ['comment' => '格式化数据'])]
     private ?array $newRow = null;
 
@@ -87,28 +97,36 @@ class AsyncImportErrorLog implements \Stringable
         $this->line = $line;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRawRow(): ?array
     {
         return $this->rawRow;
     }
 
-    public function setRawRow(?array $rawRow): static
+    /**
+     * @param array<string, mixed>|null $rawRow
+     */
+    public function setRawRow(?array $rawRow): void
     {
         $this->rawRow = $rawRow;
-
-        return $this;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getNewRow(): ?array
     {
         return $this->newRow;
     }
 
-    public function setNewRow(?array $newRow): static
+    /**
+     * @param array<string, mixed>|null $newRow
+     */
+    public function setNewRow(?array $newRow): void
     {
         $this->newRow = $newRow;
-
-        return $this;
     }
 
     public function __toString(): string

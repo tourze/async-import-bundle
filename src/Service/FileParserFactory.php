@@ -10,17 +10,14 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 /**
  * 文件解析器工厂
  */
-class FileParserFactory
+readonly class FileParserFactory
 {
     /**
-     * @var FileParserInterface[]
+     * @param FileParserInterface[] $parsers
      */
-    private iterable $parsers;
-
     public function __construct(
-        #[AutowireIterator(tag: 'async_import.file_parser')] iterable $parsers
+        #[AutowireIterator(tag: 'async_import.file_parser')] private iterable $parsers,
     ) {
-        $this->parsers = $parsers;
     }
 
     /**
@@ -49,12 +46,14 @@ class FileParserFactory
             'xls' => ImportFileType::XLS,
             'xlsx' => ImportFileType::XLSX,
             'json' => ImportFileType::JSON,
-            default => throw new UnsupportedFileTypeException(sprintf('Unknown file extension: %s', $extension))
+            default => throw new UnsupportedFileTypeException(sprintf('Unknown file extension: %s', $extension)),
         };
     }
 
     /**
      * 获取支持的文件类型
+     *
+     * @return array<ImportFileType>
      */
     public function getSupportedFileTypes(): array
     {
@@ -66,6 +65,7 @@ class FileParserFactory
                 }
             }
         }
+
         return array_unique($types, SORT_REGULAR);
     }
 }

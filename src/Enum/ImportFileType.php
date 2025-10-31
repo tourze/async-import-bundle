@@ -2,17 +2,17 @@
 
 namespace AsyncImportBundle\Enum;
 
+use Tourze\EnumExtra\BadgeInterface;
 use Tourze\EnumExtra\Itemable;
 use Tourze\EnumExtra\ItemTrait;
 use Tourze\EnumExtra\Labelable;
 use Tourze\EnumExtra\Selectable;
 use Tourze\EnumExtra\SelectTrait;
 
-enum ImportFileType: string implements Labelable, Itemable, Selectable
+enum ImportFileType: string implements Labelable, Itemable, Selectable, BadgeInterface
 {
     use ItemTrait;
     use SelectTrait;
-
     case CSV = 'csv';
     case EXCEL = 'excel';
     case XLS = 'xls';
@@ -30,6 +30,9 @@ enum ImportFileType: string implements Labelable, Itemable, Selectable
         };
     }
 
+    /**
+     * @return array<string>
+     */
     public function mimeTypes(): array
     {
         return match ($this) {
@@ -41,6 +44,9 @@ enum ImportFileType: string implements Labelable, Itemable, Selectable
         };
     }
 
+    /**
+     * @return array<string>
+     */
     public function extensions(): array
     {
         return match ($this) {
@@ -49,6 +55,17 @@ enum ImportFileType: string implements Labelable, Itemable, Selectable
             self::XLS => ['xls'],
             self::XLSX => ['xlsx'],
             self::JSON => ['json'],
+        };
+    }
+
+    public function getBadge(): string
+    {
+        return match ($this) {
+            self::CSV => 'secondary',
+            self::EXCEL => 'success',
+            self::XLS => 'warning',
+            self::XLSX => 'info',
+            self::JSON => 'primary',
         };
     }
 }

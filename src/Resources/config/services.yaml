@@ -4,25 +4,32 @@ services:
     autowire: true      # Automatically injects dependencies in your services.
     autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+  AsyncImportBundle\Controller\:
+    resource: '../../Controller/'
   AsyncImportBundle\Repository\:
     resource: '../../Repository/'
-    
-  AsyncImportBundle\Service\:
-    resource: '../../Service/'
-    exclude:
-      - '../../Service/ImportHandlerInterface.php'
-      - '../../Service/FileParserInterface.php'
-      - '../../Service/ValidationResult.php'
 
-  # 配置主服务
-  AsyncImportBundle\Service\AsyncImportService:
-    arguments:
-      $uploadDirectory: '%kernel.project_dir%/var/import'
+  # 明确定义各个服务
+  AsyncImportBundle\Service\AsyncImportService: ~
+  AsyncImportBundle\Service\FileParserFactory: ~
+  AsyncImportBundle\Service\ImportHandlerRegistry: ~
+  AsyncImportBundle\Service\ImportProgressTracker: ~
+  AsyncImportBundle\Service\Parser\CsvParser: ~
+  AsyncImportBundle\Service\Parser\ExcelParser: ~
+  AsyncImportBundle\Service\Parser\JsonParser: ~
 
   # 文件解析器自动标签
   _instanceof:
     AsyncImportBundle\Service\FileParserInterface:
       tags: ['async_import.file_parser']
-      
     AsyncImportBundle\Service\ImportHandlerInterface:
       tags: ['async_import.handler']
+
+  # Message handlers
+  AsyncImportBundle\MessageHandler\:
+    resource: '../../MessageHandler/'
+
+  # Admin Menu Service
+  AsyncImportBundle\Service\AdminMenu:
+    tags:
+      - { name: 'tourze.easy_admin_menu.provider' }

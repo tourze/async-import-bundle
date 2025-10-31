@@ -5,14 +5,12 @@ namespace AsyncImportBundle\Repository;
 use AsyncImportBundle\Entity\AsyncImportErrorLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Tourze\PHPUnitSymfonyKernelTest\Attribute\AsRepository;
 
 /**
  * @extends ServiceEntityRepository<AsyncImportErrorLog>
- * @method AsyncImportErrorLog|null find($id, $lockMode = null, $lockVersion = null)
- * @method AsyncImportErrorLog|null findOneBy(array $criteria, array $orderBy = null)
- * @method AsyncImportErrorLog[] findAll()
- * @method AsyncImportErrorLog[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
+#[AsRepository(entityClass: AsyncImportErrorLog::class)]
 class AsyncImportErrorLogRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -31,16 +29,18 @@ class AsyncImportErrorLogRepository extends ServiceEntityRepository
             ->where('e.taskId = :taskId')
             ->setParameter('taskId', $taskId)
             ->orderBy('e.line', 'ASC')
-            ->addOrderBy('e.createTime', 'ASC');
+            ->addOrderBy('e.createTime', 'ASC')
+        ;
 
-        if ($limit !== null) {
+        if (null !== $limit) {
             $qb->setMaxResults($limit);
         }
 
-        if ($offset !== null) {
+        if (null !== $offset) {
             $qb->setFirstResult($offset);
         }
 
+        /** @var array<AsyncImportErrorLog> */
         return $qb->getQuery()->getResult();
     }
 
@@ -54,7 +54,8 @@ class AsyncImportErrorLogRepository extends ServiceEntityRepository
             ->where('e.taskId = :taskId')
             ->setParameter('taskId', $taskId)
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getSingleScalarResult()
+        ;
     }
 
     /**
@@ -62,19 +63,24 @@ class AsyncImportErrorLogRepository extends ServiceEntityRepository
      */
     public function deleteByTaskId(string $taskId): int
     {
+        /** @var int */
         return $this->createQueryBuilder('e')
             ->delete()
             ->where('e.taskId = :taskId')
             ->setParameter('taskId', $taskId)
             ->getQuery()
-            ->execute();
+            ->execute()
+        ;
     }
 
     /**
      * 按错误类型分组统计
+     *
+     * @return array<array{error: string, count: int}>
      */
     public function getErrorStatistics(string $taskId): array
     {
+        /** @var array<array{error: string, count: string}> */
         $result = $this->createQueryBuilder('e')
             ->select('e.error, COUNT(e.id) as count')
             ->where('e.taskId = :taskId')
@@ -82,13 +88,14 @@ class AsyncImportErrorLogRepository extends ServiceEntityRepository
             ->groupBy('e.error')
             ->orderBy('count', 'DESC')
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
 
         $statistics = [];
         foreach ($result as $row) {
             $statistics[] = [
-                'error' => $row['error'],
-                'count' => (int) $row['count']
+                'error' => (string) $row['error'],
+                'count' => (int) $row['count'],
             ];
         }
 
@@ -102,10 +109,36 @@ class AsyncImportErrorLogRepository extends ServiceEntityRepository
      */
     public function findRecent(int $limit = 100): array
     {
+        /** @var array<AsyncImportErrorLog> */
         return $this->createQueryBuilder('e')
             ->orderBy('e.createTime', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
+    }
+
+    /**
+     * 保存实体
+     */
+    public function save(AsyncImportErrorLog $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    /**
+     * 移除实体
+     */
+    public function remove(AsyncImportErrorLog $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
     }
 }

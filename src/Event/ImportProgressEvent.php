@@ -16,7 +16,8 @@ class ImportProgressEvent extends Event
         private readonly int $success,
         private readonly int $failed,
         private readonly float $speed,
-        private readonly ?int $eta
+        private readonly ?int $eta,
+        private readonly float $percentage,
     ) {
     }
 
@@ -52,6 +53,6 @@ class ImportProgressEvent extends Event
 
     public function getPercentage(): float
     {
-        return $this->task->getProgressPercentage();
+        return $this->percentage;
     }
 }

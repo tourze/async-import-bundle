@@ -1,22 +1,25 @@
 <?php
 
-namespace AsyncImportBundle\Tests\Unit\Exception;
+namespace AsyncImportBundle\Tests\Exception;
 
 use AsyncImportBundle\Exception\FileParseException;
-use PHPUnit\Framework\TestCase;
-use RuntimeException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\PHPUnitBase\AbstractExceptionTestCase;
 
 /**
  * FileParseException 测试
+ *
+ * @internal
  */
-class FileParseExceptionTest extends TestCase
+#[CoversClass(FileParseException::class)]
+final class FileParseExceptionTest extends AbstractExceptionTestCase
 {
     public function testExceptionInstance(): void
     {
         $exception = new FileParseException('Test message');
-        
+
         $this->assertInstanceOf(FileParseException::class, $exception);
-        $this->assertInstanceOf(RuntimeException::class, $exception);
+        $this->assertInstanceOf(\RuntimeException::class, $exception);
         $this->assertEquals('Test message', $exception->getMessage());
     }
 
@@ -24,7 +27,7 @@ class FileParseExceptionTest extends TestCase
     {
         $previous = new \Exception('Previous exception');
         $exception = new FileParseException('Test message', 500, $previous);
-        
+
         $this->assertEquals('Test message', $exception->getMessage());
         $this->assertEquals(500, $exception->getCode());
         $this->assertSame($previous, $exception->getPrevious());

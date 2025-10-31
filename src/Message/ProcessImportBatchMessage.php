@@ -5,13 +5,16 @@ namespace AsyncImportBundle\Message;
 /**
  * 处理导入批次消息
  */
-class ProcessImportBatchMessage
+readonly class ProcessImportBatchMessage
 {
+    /**
+     * @param array<array<string, mixed>> $rows
+     */
     public function __construct(
-        private readonly string $taskId,
-        private readonly array $rows,
-        private readonly int $startLine,
-        private readonly int $endLine
+        private string $taskId,
+        private array $rows,
+        private int $startLine,
+        private int $endLine,
     ) {
     }
 
@@ -20,6 +23,9 @@ class ProcessImportBatchMessage
         return $this->taskId;
     }
 
+    /**
+     * @return array<array<string, mixed>>
+     */
     public function getRows(): array
     {
         return $this->rows;

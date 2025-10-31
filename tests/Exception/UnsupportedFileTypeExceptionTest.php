@@ -1,22 +1,25 @@
 <?php
 
-namespace AsyncImportBundle\Tests\Unit\Exception;
+namespace AsyncImportBundle\Tests\Exception;
 
 use AsyncImportBundle\Exception\UnsupportedFileTypeException;
-use PHPUnit\Framework\TestCase;
-use RuntimeException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\PHPUnitBase\AbstractExceptionTestCase;
 
 /**
  * UnsupportedFileTypeException 测试
+ *
+ * @internal
  */
-class UnsupportedFileTypeExceptionTest extends TestCase
+#[CoversClass(UnsupportedFileTypeException::class)]
+final class UnsupportedFileTypeExceptionTest extends AbstractExceptionTestCase
 {
     public function testExceptionInstance(): void
     {
         $exception = new UnsupportedFileTypeException('Test message');
-        
+
         $this->assertInstanceOf(UnsupportedFileTypeException::class, $exception);
-        $this->assertInstanceOf(RuntimeException::class, $exception);
+        $this->assertInstanceOf(\RuntimeException::class, $exception);
         $this->assertEquals('Test message', $exception->getMessage());
     }
 
@@ -24,7 +27,7 @@ class UnsupportedFileTypeExceptionTest extends TestCase
     {
         $previous = new \Exception('Previous exception');
         $exception = new UnsupportedFileTypeException('Test message', 400, $previous);
-        
+
         $this->assertEquals('Test message', $exception->getMessage());
         $this->assertEquals(400, $exception->getCode());
         $this->assertSame($previous, $exception->getPrevious());

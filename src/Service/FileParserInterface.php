@@ -2,6 +2,7 @@
 
 namespace AsyncImportBundle\Service;
 
+use AsyncImportBundle\DTO\ValidationResult;
 use AsyncImportBundle\Enum\ImportFileType;
 
 /**
@@ -18,18 +19,22 @@ interface FileParserInterface
      * 解析文件并返回数据行迭代器
      *
      * @param string $filePath 文件路径
-     * @param array $options 解析选项
+     * @param array<string, mixed> $options 解析选项
+     *
      * @return \Iterator 数据行迭代器
      */
     public function parse(string $filePath, array $options = []): \Iterator;
 
     /**
      * 获取文件总行数（不包括表头）
+     * @param array<string, mixed> $options
      */
     public function countRows(string $filePath, array $options = []): int;
 
     /**
      * 获取文件的列标题
+     * @param array<string, mixed> $options
+     * @return array<string>
      */
     public function getHeaders(string $filePath, array $options = []): array;
 

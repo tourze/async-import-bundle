@@ -2,216 +2,284 @@
 
 namespace AsyncImportBundle\Service\Parser;
 
+use AsyncImportBundle\DTO\ValidationResult;
 use AsyncImportBundle\Enum\ImportFileType;
 use AsyncImportBundle\Exception\FileParseException;
 use AsyncImportBundle\Service\FileParserInterface;
-use AsyncImportBundle\Service\ValidationResult;
 
 /**
  * CSV 文件解析器
  */
 class CsvParser implements FileParserInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function supports(ImportFileType $fileType): bool
     {
-        return $fileType === ImportFileType::CSV;
+        return ImportFileType::CSV === $fileType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function parse(string $filePath, array $options = []): \Iterator
     {
-        $delimiter = $options['delimiter'] ?? ',';
-        $enclosure = $options['enclosure'] ?? '"';
-        $escape = $options['escape'] ?? '\\';
-        $skipHeader = $options['skipHeader'] ?? true;
-        $encoding = $options['encoding'] ?? 'UTF-8';
-        
-        if (!file_exists($filePath)) {
-            throw new FileParseException(sprintf('File not found: %s', $filePath));
-        }
-        
-        $handle = fopen($filePath, 'r');
-        if (!$handle) {
-            throw new FileParseException(sprintf('Failed to open file: %s', $filePath));
-        }
-        
-        // 检测并转换编码
-        if ($encoding !== 'UTF-8') {
-            stream_filter_append($handle, sprintf('convert.iconv.%s/UTF-8', $encoding));
-        }
-        
+        $this->validateFileExists($filePath);
+
+        $parseOptions = $this->parseCsvOptions($options);
+        $handle = $this->openFileHandle($filePath, $parseOptions['encoding']);
+
         try {
             $headers = null;
             $lineNumber = 0;
-            
-            while (($data = fgetcsv($handle, 0, $delimiter, $enclosure, $escape)) !== false) {
-                $lineNumber++;
-                
-                // 跳过空行
-                if (empty($data) || (count($data) === 1 && empty($data[0]))) {
+
+            while (($data = $this->readCsvLine($handle, $parseOptions)) !== false) {
+                ++$lineNumber;
+
+                if ($this->isEmptyLine($data)) {
                     continue;
                 }
-                
-                // 处理表头
-                if ($skipHeader && $headers === null) {
+
+                if ($this->shouldProcessAsHeader($parseOptions['skipHeader'], $headers)) {
                     $headers = $data;
                     continue;
                 }
-                
-                // 如果有表头，转换为关联数组
-                if ($headers !== null) {
-                    // 确保数据列数与表头一致
-                    $dataCount = count($data);
-                    $headerCount = count($headers);
-                    
-                    if ($dataCount < $headerCount) {
-                        // 补充缺少的列
-                        $data = array_pad($data, $headerCount, '');
-                    } elseif ($dataCount > $headerCount) {
-                        // 截断多余的列
-                        $data = array_slice($data, 0, $headerCount);
-                    }
-                    
-                    yield array_combine($headers, $data);
-                } else {
-                    yield $data;
-                }
+
+                yield $this->formatLineData($data, $headers);
             }
         } finally {
             fclose($handle);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function countRows(string $filePath, array $options = []): int
     {
-        $skipHeader = $options['skipHeader'] ?? true;
-        
+        $skipHeader = (bool) ($options['skipHeader'] ?? true);
+
         if (!file_exists($filePath)) {
             throw new FileParseException(sprintf('File not found: %s', $filePath));
         }
-        
+
         $lineCount = 0;
         $handle = fopen($filePath, 'r');
-        
-        if (!$handle) {
+
+        if (false === $handle) {
             throw new FileParseException(sprintf('Failed to open file: %s', $filePath));
         }
-        
+
         try {
-            while (fgets($handle) !== false) {
-                $lineCount++;
+            while (false !== fgets($handle)) {
+                ++$lineCount;
             }
-            
+
             // 减去表头行
             if ($skipHeader && $lineCount > 0) {
-                $lineCount--;
+                --$lineCount;
             }
-            
+
             return $lineCount;
         } finally {
             fclose($handle);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getHeaders(string $filePath, array $options = []): array
     {
-        $delimiter = $options['delimiter'] ?? ',';
-        $enclosure = $options['enclosure'] ?? '"';
-        $escape = $options['escape'] ?? '\\';
-        $encoding = $options['encoding'] ?? 'UTF-8';
-        
+        $parseOptions = $this->parseCsvOptions($options);
+        $delimiter = $parseOptions['delimiter'];
+        $enclosure = $parseOptions['enclosure'];
+        $escape = $parseOptions['escape'];
+        $encoding = $parseOptions['encoding'];
+
         if (!file_exists($filePath)) {
             throw new FileParseException(sprintf('File not found: %s', $filePath));
         }
-        
+
         $handle = fopen($filePath, 'r');
-        if (!$handle) {
+        if (false === $handle) {
             throw new FileParseException(sprintf('Failed to open file: %s', $filePath));
         }
-        
+
         // 检测并转换编码
-        if ($encoding !== 'UTF-8') {
+        if ('UTF-8' !== $encoding) {
             stream_filter_append($handle, sprintf('convert.iconv.%s/UTF-8', $encoding));
         }
-        
+
         try {
             $headers = fgetcsv($handle, 0, $delimiter, $enclosure, $escape);
-            
-            if ($headers === false) {
+
+            if (false === $headers) {
                 return [];
             }
-            
+
             // 清理表头（去除空格、BOM等）
-            return array_map(function ($header) {
-                // 移除 BOM
-                $header = str_replace("\xEF\xBB\xBF", '', $header);
-                // 去除首尾空格
-                return trim($header);
-            }, $headers);
-            
+            return array_map(fn ($header) => trim(str_replace("\xEF\xBB\xBF", '', $header ?? '')), $headers);
         } finally {
             fclose($handle);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validateFormat(string $filePath): ValidationResult
     {
         if (!file_exists($filePath)) {
             return ValidationResult::failure('文件不存在');
         }
-        
+
         if (!is_readable($filePath)) {
             return ValidationResult::failure('文件不可读');
         }
-        
-        $fileSize = filesize($filePath);
-        if ($fileSize === 0) {
+
+        if ($this->isFileEmpty($filePath)) {
             return ValidationResult::failure('文件为空');
         }
-        
-        // 检查文件扩展名
-        $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
-        if ($extension !== 'csv') {
+
+        if (!$this->hasValidExtension($filePath)) {
+            $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+
             return ValidationResult::failure(sprintf('文件扩展名不正确: %s', $extension));
         }
-        
-        // 尝试读取第一行验证格式
+
+        return $this->validateCsvContent($filePath);
+    }
+
+    private function validateFileExists(string $filePath): void
+    {
+        if (!file_exists($filePath)) {
+            throw new FileParseException(sprintf('File not found: %s', $filePath));
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     * @return array{delimiter: string, enclosure: string, escape: string, skipHeader: bool, encoding: string}
+     */
+    private function parseCsvOptions(array $options): array
+    {
+        return [
+            'delimiter' => is_string($options['delimiter'] ?? null) ? $options['delimiter'] : ',',
+            'enclosure' => is_string($options['enclosure'] ?? null) ? $options['enclosure'] : '"',
+            'escape' => is_string($options['escape'] ?? null) ? $options['escape'] : '\\',
+            'skipHeader' => is_bool($options['skipHeader'] ?? null) ? $options['skipHeader'] : true,
+            'encoding' => is_string($options['encoding'] ?? null) ? $options['encoding'] : 'UTF-8',
+        ];
+    }
+
+    /**
+     * @return resource
+     */
+    private function openFileHandle(string $filePath, string $encoding)
+    {
         $handle = fopen($filePath, 'r');
-        if (!$handle) {
+        if (false === $handle) {
+            throw new FileParseException(sprintf('Failed to open file: %s', $filePath));
+        }
+
+        // 检测并转换编码
+        if ('UTF-8' !== $encoding) {
+            stream_filter_append($handle, sprintf('convert.iconv.%s/UTF-8', $encoding));
+        }
+
+        return $handle;
+    }
+
+    /**
+     * @param resource $handle
+     * @param array{delimiter: string, enclosure: string, escape: string, skipHeader: bool, encoding: string} $options
+     * @return array<string|null>|false
+     */
+    private function readCsvLine($handle, array $options)
+    {
+        return fgetcsv(
+            $handle,
+            0,
+            $options['delimiter'],
+            $options['enclosure'],
+            $options['escape']
+        );
+    }
+
+    /**
+     * @param array<string|null> $data
+     */
+    private function isEmptyLine(array $data): bool
+    {
+        return [] === $data || (1 === count($data) && (null === $data[0] || '' === $data[0]));
+    }
+
+    /**
+     * @param array<string|null>|null $headers
+     */
+    private function shouldProcessAsHeader(bool $skipHeader, ?array $headers): bool
+    {
+        return $skipHeader && null === $headers;
+    }
+
+    /**
+     * @param array<string|null> $data
+     * @param array<string|null>|null $headers
+     * @return array<string, string>|array<string>
+     */
+    private function formatLineData(array $data, ?array $headers): array
+    {
+        if (null !== $headers) {
+            // 确保数据列数与表头一致
+            $dataCount = count($data);
+            $headerCount = count($headers);
+
+            if ($dataCount < $headerCount) {
+                // 补充缺少的列
+                $data = array_pad($data, $headerCount, '');
+            } elseif ($dataCount > $headerCount) {
+                // 截断多余的列
+                $data = array_slice($data, 0, $headerCount);
+            }
+
+            // 转换null值为空字符串，确保类型一致
+            $cleanHeaders = array_map(fn ($h) => (string) $h, $headers);
+            $cleanData = array_map(fn ($d) => (string) $d, $data);
+
+            return array_combine($cleanHeaders, $cleanData);
+        }
+
+        // 转换null值为空字符串
+        return array_map(fn ($d) => (string) $d, $data);
+    }
+
+    private function isFileEmpty(string $filePath): bool
+    {
+        return 0 === filesize($filePath);
+    }
+
+    private function hasValidExtension(string $filePath): bool
+    {
+        $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+
+        return 'csv' === $extension;
+    }
+
+    private function validateCsvContent(string $filePath): ValidationResult
+    {
+        $handle = fopen($filePath, 'r');
+        if (false === $handle) {
             return ValidationResult::failure('无法打开文件');
         }
-        
+
         try {
             $firstLine = fgets($handle);
-            if ($firstLine === false) {
+            if (false === $firstLine) {
                 return ValidationResult::failure('无法读取文件内容');
             }
-            
+
             // 检查是否包含分隔符
-            if (strpos($firstLine, ',') === false && 
-                strpos($firstLine, ';') === false && 
-                strpos($firstLine, "\t") === false) {
+            if (!$this->hasValidSeparator($firstLine)) {
                 return ValidationResult::failure('未找到有效的CSV分隔符');
             }
-            
+
             return ValidationResult::success();
-            
         } finally {
             fclose($handle);
         }
+    }
+
+    private function hasValidSeparator(string $line): bool
+    {
+        return false !== strpos($line, ',')
+            || false !== strpos($line, ';')
+            || false !== strpos($line, "\t");
     }
 }

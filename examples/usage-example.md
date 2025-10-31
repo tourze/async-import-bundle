@@ -7,9 +7,7 @@
 
 namespace App\Import;
 
-use AsyncImportBundle\Service\ImportHandlerInterface;
-use AsyncImportBundle\Service\ValidationResult;
-use AsyncImportBundle\Entity\AsyncImportTask;
+use AsyncImportBundle\DTO\ValidationResult;use AsyncImportBundle\Entity\AsyncImportTask;use AsyncImportBundle\Service\ImportHandlerInterface;
 
 class ProductImportHandler implements ImportHandlerInterface
 {

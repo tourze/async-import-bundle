@@ -1,6 +1,6 @@
 <?php
 
-namespace AsyncImportBundle\Service;
+namespace AsyncImportBundle\DTO;
 
 /**
  * 数据验证结果
@@ -8,7 +8,11 @@ namespace AsyncImportBundle\Service;
 class ValidationResult
 {
     private bool $valid;
+
+    /** @var array<string> */
     private array $errors = [];
+
+    /** @var array<string> */
     private array $warnings = [];
 
     public function __construct(bool $valid = true)
@@ -25,6 +29,7 @@ class ValidationResult
     {
         $result = new self(false);
         $result->addError($error);
+
         return $result;
     }
 
@@ -32,25 +37,33 @@ class ValidationResult
     {
         $this->errors[] = $error;
         $this->valid = false;
+
         return $this;
     }
 
     public function isValid(): bool
     {
-        return $this->valid && empty($this->errors);
+        return $this->valid && [] === $this->errors;
     }
 
     public function addWarning(string $warning): self
     {
         $this->warnings[] = $warning;
+
         return $this;
     }
 
+    /**
+     * @return array<string>
+     */
     public function getErrors(): array
     {
         return $this->errors;
     }
 
+    /**
+     * @return array<string>
+     */
     public function getWarnings(): array
     {
         return $this->warnings;
@@ -63,6 +76,6 @@ class ValidationResult
 
     public function hasWarnings(): bool
     {
-        return !empty($this->warnings);
+        return [] !== $this->warnings;
     }
 }

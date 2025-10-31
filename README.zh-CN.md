@@ -1,6 +1,26 @@
 # AsyncImportBundle
 
-一个功能强大的 Symfony Bundle，用于处理异步文件导入，支持 CSV、Excel 和 JSON 格式。包含进度跟踪、错误日志、重试机制和批处理等功能。
+[English](README.md) | [中文](README.zh-CN.md)
+
+[![Latest Version](https://img.shields.io/packagist/v/tourze/async-import-bundle.svg?style=flat-square)](https://packagist.org/packages/tourze/async-import-bundle)
+[![PHP Version](https://img.shields.io/packagist/php-v/tourze/async-import-bundle.svg?style=flat-square)](https://packagist.org/packages/tourze/async-import-bundle)
+[![License](https://img.shields.io/packagist/l/tourze/async-import-bundle.svg?style=flat-square)](https://packagist.org/packages/tourze/async-import-bundle)
+[![Code Coverage](https://img.shields.io/codecov/c/github/tourze/async-import-bundle?style=flat-square)](https://codecov.io/gh/tourze/async-import-bundle)
+
+一个功能强大的 Symfony Bundle，用于处理异步文件导入，支持 CSV、Excel 和 JSON 格式。
+包含进度跟踪、错误日志、重试机制和批处理等功能。
+
+## 目录
+
+- [功能特性](#功能特性)
+- [依赖要求](#依赖要求)
+- [安装](#安装)
+- [配置](#配置)
+- [使用方法](#使用方法)
+- [高级用法](#高级用法)
+- [测试](#测试)
+- [贡献](#贡献)
+- [许可证](#许可证)
 
 ## 功能特性
 
@@ -12,6 +32,28 @@
 - **批量处理**：可配置的批次大小，提高内存效率
 - **可扩展架构**：轻松添加自定义导入处理器
 - **EasyAdmin 集成**：可直接集成到管理后台
+
+## 依赖要求
+
+### 系统要求
+
+- PHP 8.1 或更高版本
+- Symfony 6.4 或更高版本
+- Doctrine ORM 3.0 或更高版本
+
+### 必需的扩展
+
+- ext-SPL
+- ext-date  
+- ext-json
+
+### 必需的包
+
+- doctrine/dbal ^4.0
+- doctrine/orm ^3.0
+- phpoffice/phpspreadsheet ^3.9
+- symfony/messenger ^6.4
+- 以及其他 Symfony 组件（完整列表请查看 composer.json）
 
 ## 安装
 
@@ -72,9 +114,7 @@ chmod 755 var/import
 
 namespace App\Import;
 
-use AsyncImportBundle\Service\ImportHandlerInterface;
-use AsyncImportBundle\Service\ValidationResult;
-use AsyncImportBundle\Entity\AsyncImportTask;
+use AsyncImportBundle\DTO\ValidationResult;use AsyncImportBundle\Entity\AsyncImportTask;use AsyncImportBundle\Service\ImportHandlerInterface;
 
 class UserImportHandler implements ImportHandlerInterface
 {
@@ -188,7 +228,7 @@ public function progress(
 ## 文件格式示例
 
 ### CSV
-```csv
+```text
 邮箱,姓名
 john@example.com,张三
 jane@example.com,李四
@@ -263,7 +303,7 @@ Bundle 会分发以下事件：
 - 依赖注入测试：确保服务配置正确加载
 - 集成测试：验证服务注册和容器配置
 
-## 高级功能
+## 高级用法
 
 ### 自定义文件解析器
 

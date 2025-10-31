@@ -5,10 +5,10 @@ namespace AsyncImportBundle\Message;
 /**
  * 清理过期导入任务消息
  */
-class CleanupImportTaskMessage
+readonly class CleanupImportTaskMessage
 {
     public function __construct(
-        private readonly int $daysToKeep = 30
+        private int $daysToKeep = 30,
     ) {
     }
 
