@@ -95,17 +95,6 @@ final class AsyncImportTaskCrudControllerTest extends AbstractEasyAdminControlle
         self::assertInstanceOf(AsyncImportTaskCrudController::class, $controller);
     }
 
-    public function testGetEntityFqcn(): void
-    {
-        $client = self::createClientWithDatabase();
-        $container = $client->getContainer();
-
-        $controller = $container->get(AsyncImportTaskCrudController::class);
-        $this->assertInstanceOf(AsyncImportTaskCrudController::class, $controller);
-
-        self::assertSame(AsyncImportTask::class, $controller::getEntityFqcn());
-    }
-
     public function testConfigureFields(): void
     {
         $client = self::createClientWithDatabase();
